@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>BIDS QCjs</title>
+  </head>
+  <body>
+    <div id='qcjs'>
+        
+        <div id='subjectList'>
+        </div>
+        
+        <div id='mri-viewer' style='display:inline-block; vertical-align:top;'>
+        </div>
+        
+        <div id="surf-viewer" style='vertical-align:top'>
+        </div>
+        
+        <div id='dataType' style='position:absolute;top:10px;right:5px;display:none;width:60px;height:30px;z-index:10'>
+            <span id='MRI' class='select'>V</span>&nbsp;<span id='Surf'>S</span>
+        </div>
+
+    </div>
+    
+    <link href='https://fonts.googleapis.com/css?family=Varela+Round' rel='stylesheet'>
+
+    <div id="holder" style="display:inline-block;width:100%;height:100%">
+        <img id='folder' src="imgres.png" />
+        <div style='color:white;position:absolute;top:50%;left:46%;transform=translate(-50%,-50%);'>    
+            <p style='font-size:40px'>BIDS</p>
+        </div>
+        <div style='position:absolute;top:70%;left:39%;transform=translate(-50%,-50%);'>    
+            <p style='font-size:20px'>Katja Heuer & Roberto Toro</p>
+        </div>
+    </div>
+
+    </div>
+    
+    <style>
+        span {
+            color: white;
+            padding:5px;
+        }
+        span.select {
+            border: thin solid white;
+            border-radius:3px;
+        }
+    </style>
+
+    <link rel='stylesheet' href='style.css'>
+
+    <script>if (typeof module === 'object') {window.module = module; module = undefined;}</script>
+    
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js'></script>
+    <script src='https://cdn.rawgit.com/r03ert0/mriviewerjs/4540c056/mriviewer.js'></script>
+    <script src='https://cdn.rawgit.com/katjaq/surfjs/009246fc/surf.js'></scripts>
+    <!--<script src='libs/jquery/3.2.1/jquery.min.js'></script>-->
+    <!--<script src='http://localhost/mriviewerjs/mriviewer.js'></script>-->
+    <!--<script src='http://localhost/surfjs/surf.js'></script>-->
+
+    <script src="bower_components/yjs/y.js"></script>
+    <script src="qc.js"></script>
+    <script>if (window.module) module = window.module;</script>
+    
+    <script>
+    
+    
+
+
+
+
+        function initViewer(dirPath) {
+
+            var dataType='mri';
+
+            var mv=new MRIViewer({
+                mriPath: 'http://localhost/bids/ds001/sub-01/anat/sub-01_inplaneT2.nii.gz',
+                elem: $('#mri-viewer').get(0)
+            });
+            mv.display();
+
+            var sv=new Surf({
+                    surfPath: 'http://localhost/bids/ds001/derived/freesurfer/sub-01/surf/lh.pial.ctm',
+                    elem: $('#surf-viewer').get(0)
+                });
+            sv.display();
+        }
+
+
+
+
+
+
+
+
+        function displaySubject(sub) {
+            if(dataType=='mri') {
+                var path='http://localhost/bids/ds001/'+sub+'/anat/'+sub+'_inplaneT2.nii.gz';
+                mv.mriPath=path;
+                mv.configure();
+            } else {
+                var path='http://localhost/bids/ds001/derived/freesurfer/'+sub+'/surf/lh.pial.ctm';
+                sv.loadMesh(path);
+            }
+        }
+
+        function setDataType(type) {
+            dataType=type;
+            if(type == 'mri') {
+                $('#surf-viewer').hide();
+                $('#mri-viewer').show();
+            } else {
+                $('#surf-viewer').show();
+                $('#mri-viewer').hide();
+                dataType=type;
+            }
+        }
+
+        $('span').on('click', function () {
+            $('span').removeClass('select');
+            if($(this).attr('id')=='MRI') {
+                setDataType('mri');
+                $(this).addClass('select');
+            } else {
+                setDataType('surf');
+                $(this).addClass('select');
+                sv.onWindowResize();
+            }
+        });
+
+    </script>
+
+  </body>
+</html>
